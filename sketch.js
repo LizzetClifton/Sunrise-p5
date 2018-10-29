@@ -13,22 +13,29 @@ function setup() {
   colorSlider = createSlider(0, 145);
   colorSlider.position(200, 300);
 
-  mountain1 = new Mountain(120);
-  mountain2 = new Mountain(500);
+  mountain1 = new Mountain(600, 1);
+  mountain2 = new Mountain(800, 1.5);
+  mountain3 = new Mountain(1000, 2);
+  mountain4 = new Mountain(1200, 2.5);
 }
 
 function draw() {
   backColor = colorSlider.value();
   background(0, 0, backColor);
-  stroke(255);
-  fill(0, 0, 255);
-
+  noStroke();
+  fill(217, 34, 96);
   mountain1.display();
-  fill(255, 0, 0);
+
+  fill(174, 53, 106);
   mountain2.display();
 
-  fill(255, 210, 120)
+  fill(120, 61, 92);
+  mountain3.display();
 
+  fill(67, 45, 60);
+  mountain4.display();
+
+  fill(255, 210, 120)
   sunX = sunSlider.value();
   sunY = -(sunSlider.value());
 
@@ -39,52 +46,25 @@ function draw() {
   }
 }
 
-
 class Mountain{
-  constructor(tempheight) {
+  constructor(tempheight, variable) {
     this.h = tempheight;
+    this.v = variable;
   }
-
 
   display() {
     beginShape();
-      // var xoff = 0;
-      // for (var x = 0; x < width; x ++) {
-      //   stroke(255);
-      //   var y = noise(xoff) * (height);
-      //   vertex(x, y);
-      //   xoff = xoff + 0.004;
-      // }
+      vertex(0, height);
 
-      //starts at bottom left
+      var xoff = 0;
+      for (var x = 0; x < width; x++) {
+        var y = noise(xoff) * (this.h);
+        //vertex(x * (this.v), y);
+        vertex(x, y);
+        xoff = xoff + 0.004;
+      }
 
-
-
-      curveVertex(0, height);
-      curveVertex(0, height);
-      //goes to
-
-      curveVertex(width, height);
-
-      curveVertex(width, height/2);
-
-      // var randomx = 0;
-      //
-      // for (var x = 0; x < width; x ++) {
-      //   stroke(255);
-      //   var y = noise(randomx) * (height);
-      //   curveVertex(x, y);
-      //   randomx = randomx + 0.004;
-      //  }
-
-
-      curveVertex(width, this.h);
-
-      curveVertex(0, height/2);
-
-      curveVertex(0, height);
-      curveVertex(0, height);
-
-      endShape();
+      vertex(width, height);
+    endShape();
   }
 }
