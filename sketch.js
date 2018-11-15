@@ -3,14 +3,21 @@ var port = 9001;
 var xpos;
 var ypos;
 
+var theta = 0;
 
 var sunSlider;
 var sunX;
 var sunY;
 var colorSlider;
 
-let mountain1;
-let mountain2;
+//var star;
+
+var numStars = 80;
+
+var stars = [];
+
+// let mountain1;
+// let mountain2;
 
 var b1, b2, c1, c2;
 
@@ -32,21 +39,26 @@ function setup() {
     useSSL: true
   });
 
-  sunSlider = createSlider(0, windowWidth, 0);
+  //sunSlider = createSlider(0, windowWidth, 0);
+  sunSlider = createSlider(0, 255, 100);
   sunSlider.position(200, 200);
   colorSlider = createSlider(0, 145);
   colorSlider.position(200, 300);
 
-  mountain1 = new Mountain(600, 1);
-  mountain2 = new Mountain(800, 1.5);
-  mountain3 = new Mountain(1000, 2);
-  mountain4 = new Mountain(1200, 2.5);
+  mountain1 = new Mountain(600, 0.004);
+  mountain2 = new Mountain(800, 0.005);
+  mountain3 = new Mountain(1000, 0.002);
+  mountain4 = new Mountain(1200, 0.003);
 
   b1 = color(255);
   b2 = color(0);
   c1 = color(239, 124, 139);
   c2 = color(250, 152, 113);
 
+  for (var s = 0; s < numStars; s++) {
+   stars[s] = new Star(random(width), random(height));
+  }
+//star1 = new Star(random(width), random(height));
 }
 
 function draw() {
@@ -56,35 +68,42 @@ function draw() {
 
   setGradient(0, 0, windowWidth, windowHeight, c1, c2, 1);
 
+  for(var s = 0; s<numStars; s++){
+    stars[s].display();
+  }
+
   // for (var i = 0; i < 60; i++) {
   //  noStroke();
   //  fill(255, 255, 255);
   //  ellipse(random(windowWidth), random(windowHeight), 3, 3);
   // }
 
-  image(clouds, 100, 40, clouds.width/20, clouds.height/20);
-  image(clouds, 450, 160, clouds.width/20, clouds.height/20);
-  image(clouds, 675, 75, clouds.width/20, clouds.height/20);
-  image(clouds, 815, 135, clouds.width/20, clouds.height/20);
-  image(clouds, 990, 90, clouds.width/20, clouds.height/20);
+  image(clouds, 100, 40, clouds.width/2, clouds.height/2);
+  image(clouds, 450, 160, clouds.width/2, clouds.height/2);
+  image(clouds, 675, 75, clouds.width/2, clouds.height/2);
+  image(clouds, 815, 135, clouds.width/2, clouds.height/2);
+  image(clouds, 990, 90, clouds.width/2, clouds.height/2);
 
 
   noStroke();
   fill(255, 210, 120)
-  sunX = sunSlider.value();
-  sunY = -(sunSlider.value());
+  //sunX = sunSlider.value();
+  //sunY = -(sunSlider.value());
 
-  ellipse (sunX, (sunY + windowHeight), 150, 150);
-
+  //THIS IS THE SUN
+  push();
+  translate(width/2, height/2+300);
+  rotate(sunSlider.value()/40);
+  translate(550, 0);
+  //ellipse(0, 0, 32, 32);
+  ellipse(0, 0, 150, 150);
   fill(255, 210, 120, 80);
-  ellipse (sunX, (sunY + windowHeight), (sin(frameCount/20) * 180), (sin(frameCount/20) * 180));
+  ellipse (0, 0, (sin(frameCount/20) * 180), (sin(frameCount/20) * 180));
 
   fill(255, 210, 120, 40);
-  ellipse (sunX, (sunY + windowHeight), (sin(frameCount/20) * 200), (sin(frameCount/20) * 200));
+  ellipse (0, 0, (sin(frameCount/20) * 200), (sin(frameCount/20) * 200));
 
-  if(sunX > (windowWidth/2)) {
-    sunY = -sunY;
-  }
+  pop();
 
   fill(217, 34, 96);
   mountain1.display();
@@ -98,7 +117,21 @@ function draw() {
   fill(67, 45, 60);
   mountain4.display();
 
+  fill(255, 255, 255);
+
+
+
+  //star1.display();
+
   ellipse(xpos, ypos, 100, 100);
+
+  // translate(windowWidth/2, windowHeight/2);
+  // fill(255, 200, 50);
+  // ellipse(0, 0, 64, 64);
+  //
+  // // The earth rotates around the sun
+  //
+  // theta += 0.01;
 
 }
 
@@ -118,10 +151,22 @@ class Mountain{
         var y = noise(xoff) * (this.h);
         //vertex(x * (this.v), y);
         vertex(x, y);
-        xoff = xoff + 0.004;
+        xoff = xoff + this.v;
       }
       vertex(width, height);
     endShape();
+  }
+}
+
+class Star{
+  constructor(starX, starY) {
+    this.x = starX;
+    this.y = starY;
+  }
+  display() {
+     noStroke();
+     fill(255, 255, 255);
+     ellipse(this.x, this.y, 3, 3);
   }
 }
 
