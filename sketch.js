@@ -1,27 +1,30 @@
 var hostname = "mqtt.colab.duke.edu";
 var port = 9001;
 var xpos;
-var ypos;
+var zpos;
+var sunpos;
 
 var theta = 0;
 
 var sunSlider;
 var sunX;
 var sunY;
-var colorSlider;
+//var colorSlider;
 
-//var star;
+// let rain = [];
+// let numdrops = 250;
 
 var numStars = 80;
 
 var stars = [];
 
-// let mountain1;
-// let mountain2;
-
-var b1, b2, c1, c2;
+var c1, c2;
 
 let clouds;
+
+var numClouds = 10;
+
+var clouds2 = [];
 
 function preload() {
   clouds = loadImage('./images/cloud.png');
@@ -30,7 +33,7 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  client = new Paho.MQTT.Client(hostname, port, "", "Lizzet");
+  client = new Paho.MQTT.Client(hostname, port, "", "DukeOpend");
   client.onConnectionLost = onConnectionLost;
   client.onMessageArrived = onMessageArrived; // msg parsing callback
   // connect the client using SSL and trigger onConnect callback
@@ -39,32 +42,43 @@ function setup() {
     useSSL: true
   });
 
-  //sunSlider = createSlider(0, windowWidth, 0);
-  sunSlider = createSlider(0, 255, 100);
-  sunSlider.position(200, 200);
-  colorSlider = createSlider(0, 145);
-  colorSlider.position(200, 300);
+  // colorSlider = createSlider(0, 145);
+  // colorSlider.position(200, 300);
 
-  mountain1 = new Mountain(600, 0.004);
-  mountain2 = new Mountain(800, 0.005);
-  mountain3 = new Mountain(1000, 0.002);
-  mountain4 = new Mountain(1200, 0.003);
+  mountain1 = new Mountain(600, 0.003);
+  mountain2 = new Mountain(800, 0.002);
+  mountain3 = new Mountain(1000, 0.0035);
+  mountain4 = new Mountain(1200, 0.002);
 
-  b1 = color(255);
-  b2 = color(0);
-  c1 = color(239, 124, 139);
-  c2 = color(250, 152, 113);
+
 
   for (var s = 0; s < numStars; s++) {
    stars[s] = new Star(random(width), random(height));
   }
-//star1 = new Star(random(width), random(height));
+
+  for (var s = 0; s < numClouds; s++) {
+   clouds2[s] = new Cloud(random(width), random(0, height/2), random(.1,1), random(1.5, 3.5));
+  }
+
+//THESE ARE THE RAIN DROPS
+  // for (let i = 0; i < numdrops; i++) {
+  //   rain[i] = new Drop(random(0, width), random(-200, 0), 5, 10, random(7, 10))
+  // }
+
 }
 
 function draw() {
-  backColor = colorSlider.value();
-  background(0, 0, backColor);
+  // backColor = colorSlider.value();
+  // background(0, 0, backColor);
 
+  //c3 = xpos + 10;
+  // c1 = color(250, 124, 139);
+  // c2 = color(250, 152, 113);
+
+  //sunpos = map(zpos, 0, 240, 0, 255);
+  c1 = color(sunpos, sunpos-50, 70);
+  c2 = color(200, 50, 90);
+  //c2 = color(sunpos, 150, 110);
 
   setGradient(0, 0, windowWidth, windowHeight, c1, c2, 1);
 
@@ -72,17 +86,12 @@ function draw() {
     stars[s].display();
   }
 
-  // for (var i = 0; i < 60; i++) {
-  //  noStroke();
-  //  fill(255, 255, 255);
-  //  ellipse(random(windowWidth), random(windowHeight), 3, 3);
-  // }
 
-  image(clouds, 100, 40, clouds.width/2, clouds.height/2);
-  image(clouds, 450, 160, clouds.width/2, clouds.height/2);
-  image(clouds, 675, 75, clouds.width/2, clouds.height/2);
-  image(clouds, 815, 135, clouds.width/2, clouds.height/2);
-  image(clouds, 990, 90, clouds.width/2, clouds.height/2);
+  // image(clouds, 100, 40, clouds.width/2, clouds.height/2);
+  // image(clouds, 450, 160, clouds.width/2, clouds.height/2);
+  // image(clouds, 675, 75, clouds.width/2, clouds.height/2);
+  // image(clouds, 815, 135, clouds.width/2, clouds.height/2);
+  // image(clouds, 990, 90, clouds.width/2, clouds.height/2);
 
 
   noStroke();
@@ -93,15 +102,15 @@ function draw() {
   //THIS IS THE SUN
   push();
   translate(width/2, height/2+300);
-  rotate(sunSlider.value()/40);
+  rotate(zpos/10);
   translate(550, 0);
   //ellipse(0, 0, 32, 32);
-  ellipse(0, 0, 150, 150);
+  ellipse(0, -50, 180, 180);
   fill(255, 210, 120, 80);
-  ellipse (0, 0, (sin(frameCount/20) * 180), (sin(frameCount/20) * 180));
+  ellipse (0, -50, (sin(frameCount/40) * 220), (sin(frameCount/40) * 220));
 
   fill(255, 210, 120, 40);
-  ellipse (0, 0, (sin(frameCount/20) * 200), (sin(frameCount/20) * 200));
+  ellipse (0, -50, (sin(frameCount/40) * 260), (sin(frameCount/40) * 260));
 
   pop();
 
@@ -118,20 +127,14 @@ function draw() {
   mountain4.display();
 
   fill(255, 255, 255);
+//THESE ARE THE RAIN DROPS
+// for (let i = 0; i < numdrops; i ++) {
+//   rain[i].display();
+// }
 
-
-
-  //star1.display();
-
-  ellipse(xpos, ypos, 100, 100);
-
-  // translate(windowWidth/2, windowHeight/2);
-  // fill(255, 200, 50);
-  // ellipse(0, 0, 64, 64);
-  //
-  // // The earth rotates around the sun
-  //
-  // theta += 0.01;
+  for(var s = 0; s<numClouds; s++){
+    clouds2[s].display();
+  }
 
 }
 
@@ -144,12 +147,10 @@ class Mountain{
   display() {
     beginShape();
       vertex(0, height);
-      //vertex(0, height/2);
       var xoff = 0;
-      //for (var x = 50; x < width; x++) {
-      for (var x = 0; x < width; x++) {
+      for (var x = 0; x <= width; x++) {
         var y = noise(xoff) * (this.h);
-        //vertex(x * (this.v), y);
+        y = y + 100;
         vertex(x, y);
         xoff = xoff + this.v;
       }
@@ -170,6 +171,24 @@ class Star{
   }
 }
 
+class Cloud{
+  constructor(cloudX, cloudY, cloudS, cloudT) {
+    this.x = cloudX;
+    this.y = cloudY;
+    this.s = cloudS;
+    this.t = cloudT;
+  }
+  display() {
+    //  noStroke();
+    //  fill(255, 255, 255);
+    image(clouds, this.x, this.y, clouds.width/this.t, clouds.height/this.t);
+    if(this.x < -200) {
+      this.x = width;
+    }
+    this.x = this.x - this.s;
+  }
+}
+
 
 function setGradient(x, y, w, h, c1, c2, axis) {
   noFill();
@@ -185,7 +204,7 @@ function onConnect() {
   // Once a connection has been made, make subscription(s).
   console.log("onConnect");
   client.subscribe("/positionX");
-  client.subscribe("/positionY");
+  client.subscribe("/positionZ");
 };
 
 function onConnectionLost(responseObject) {
@@ -196,10 +215,32 @@ function onConnectionLost(responseObject) {
 // mqtt incoming message parsing
 function onMessageArrived(message) {
   console.log("onMessageArrived:"+message.destinationName+": "+message.payloadString);
+  if (message.destinationName == "/positionZ"){
+    zpos = map(message.payloadString, 500, 4355, 0, 240);
+    sunpos = map(message.payloadString, 0, 255, 0, 240);
+  }
   if (message.destinationName == "/positionX"){
-    xpos = map(message.payloadString, 10, 1023, 0, windowWidth);
-  }
-  if (message.destinationName == "/positionY"){
-    ypos = map(message.payloadString, 10, 1023, 0, windowHeight);
-  }
+    xpos = map(message.payloadString, 0, 255, 0, 240);
+   }
+   console.log("onMessageArrived:"+message.destinationName+": "+message.payloadString);
 };
+
+// class Drop {
+//   constructor(tempx, tempy, tempw, temph, temps) {
+//     this.x = tempx;
+//     this.y = tempy;
+//     this.w = tempw;
+//     this.h = temph;
+//     this.s = temps;
+//   }
+//
+//
+//   display() {
+//     this.y = this.y + this.s;
+//     if(this.y > height) {
+//       this.y = 0;
+//     }
+//     fill(0, 0, 255);
+//     ellipse(this.x, this.y, this.w, this.h)
+//   }
+// }
